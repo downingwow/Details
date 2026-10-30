@@ -2,29 +2,30 @@
 
 **Maintainer:** Uncle Bone  
 **Contact:** https://github.com/downingwow  
-**Game:** Ascension — Conquest of Azeroth / Conquest Reborn (WoW 3.3.5a-based client)
+**Bug reports:** https://github.com/downingwow/Details/issues  
+**Game:** Ascension / Conquest of Azeroth / Conquest Reborn (WoW 3.3.5a-based)
 
-A Conquest Reborn adaptation of Details! Damage Meter that tracks damage, DPS, healing, HPS, combat encounters, and pet/guardian contributions. The addon includes the original Details! multi-module package. Third-party copyright and license notices remain intact.
+A customized Details! damage and healing meter for Conquest Reborn. Tracks damage, DPS, healing, HPS, combat segments, spell breakdowns, pets and guardians. Original third-party licenses and attribution must be retained.
 
-## Latest local test build: v1.0.3 (TEST)
+## Current build: v1.1.0 TEST (2026-10-29)
 
-- Preserve trash and unrecognized custom-boss encounter history across logout/reload, subject to configured save limit.
-- Increased default saved history to 50 for new profiles (existing profile preferences remain).
-- Harden summon event handling against missing GUIDs and unnamed creatures.
-- Improve pet display fallback using cached pet name, summon spell name, or client spell name.
-- Correct the existing Tinker spec 51 label to **Demolition**.
-- Update maintainer/contact/repository metadata to Uncle Bone / downingwow.
+The complete test ZIP was generated in the addon development conversation. **It is not attached to this GitHub repository as a release asset**, and the complete source tree has not been uploaded here. Do not install the repository README alone.
 
-**Status:** Test build; static ZIP integrity checked, not validated inside Conquest Reborn. Complete all-class spell-ID import and verification of custom summons remain open tasks.
+### Implemented
+- Primalist pet identification verified in-game with a Devilsaur.
+- Pet damage ownership from observed CoA combat-log focus/synergy events.
+- Pet-only pull combat starts on damaging events, with first-hit owner resolution from the client pet GUID, cache, or group pet scan (test needed).
+- Protect against invalid summon GUIDs and missing creature names.
+- Combat history retention patches; 50 default saved segments for new profiles (needs live zone/reload verification).
+- Tinker Demolition display-label correction.
+- Contact and feedback point to Uncle Bone / downingwow.
 
-### Data references
-- [CoA AzerothCore](https://github.com/Conquest-of-AzerothCore/azerothcore-wotlk-coa)
-- [DealsBeam Ascension DB](https://github.com/DealsBeam/ascension-db)
-- [CoA preservation data](https://github.com/Bharph/coa-preservation-data)
-- [CoA Databank](https://github.com/f3rr311/CoA-Databank)
-- [Talent scraper](https://github.com/v1cferr/ascension-coa-scraper)
-- [CoA talents](https://coa-development.org/talents)
-- [Ascension database](https://ascension-db.ascension-archive.workers.dev/)
-- [Historical BisBeard glyph data](https://github.com/kevinvongmany/bisbeard-db)
+### Still not complete
+- Exhaustive imported/verified all-class spell IDs, specs and Tinker Mechanics/Invention/Demolition combat mechanics.
+- Full coverage of custom turrets/constructs/guardians, absorbs, and proc ownership.
+- In-game QA of v1.1.0 and zone/reload encounter persistence.
 
-The above repositories are research references and are **not** claimed to be exact verified Conquest Reborn game-client exports. This README is not a substitute for the source distribution: use the packaged test ZIP and back up SavedVariables first.
+## Research
+Use [CoA-Research](https://github.com/downingwow/CoA-Research) for source indexes, SQL archives, class spellbooks, talent data and BisBeard references. Historical references are not authoritative current Conquest Reborn spell IDs.
+
+See [test changelog](CHANGELOG-CoA.md). Back up SavedVariables before installing a test ZIP.
