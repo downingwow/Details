@@ -1,0 +1,1 @@
+Fix: removed unsafe class-local slot -> ChrSpecs mapping. Explicit client specialization names are class-validated; global ChrSpecs IDs are resolved exactly. Unresolved specs remain unknown instead of being misidentified.

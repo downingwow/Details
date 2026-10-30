@@ -2262,6 +2262,29 @@ end
 --/run _detalhes.ilevel:CalcItemLevel("player", UnitGUID("player"), true)
 --/run wipe(_detalhes.item_level_pool)
 
+-- CoA: inspect equipped gear directly. A legitimate zero/one heirloom level
+-- must not be discarded by the old MIN_ILEVEL_TO_STORE threshold.
+-- Unknown item links are NOT treated as zero; wait for a complete scan.
+function Details:CoAReadEquippedItemLevel(unitid)
+    if (not unitid or not UnitExists(unitid)) then return nil end
+    local total, count, pending = 0, 0, false
+    local slots = {1,2,3,5,6,7,8,9,10,11,12,13,14,15,16,17,18}
+    for _, slot in ipairs(slots) do
+        local link = GetInventoryItemLink(unitid, slot)
+        if (link) then
+            local level = select(4, GetItemInfo(link))
+            if (type(level) == "number") then
+                total = total + level
+                count = count + 1
+            else
+                pending = true
+            end
+        end
+    end
+    if (pending or count == 0) then return nil end
+    return total / count
+end
+
 function ilvl_core:CalcItemLevel(unitid, guid, shout)
 
 	if (type(unitid) == "table") then
@@ -2272,14 +2295,17 @@ function ilvl_core:CalcItemLevel(unitid, guid, shout)
 
 	--disable due to changes to CheckInteractDistance()
 	if (not InCombatLockdown() and unitid and UnitPlayerControlled(unitid) and CheckInteractDistance(unitid, CONST_INSPECT_ACHIEVEMENT_DISTANCE) and CanInspect(unitid)) then
-		local average = UnitAverageItemLevel(unitid)
+		local average = Details:CoAReadEquippedItemLevel(unitid)
+        if (average == nil and type(UnitAverageItemLevel) == "function") then
+            average = UnitAverageItemLevel(unitid)
+        end
 		--register
-		if (average > 0) then
+		if (type(average) == "number" and average >= 0) then
 			if (shout) then
 				Details:Msg(UnitName(unitid) .. " item level: " .. average)
 			end
 
-			if (average > MIN_ILEVEL_TO_STORE) then
+			if (average >= 0) then
 				local unitName = Details:GetFullName(unitid)
 				Details.item_level_pool [guid] = {name = unitName, ilvl = average, time = time()}
 			end

@@ -2078,6 +2078,109 @@ local setBarValue = function(self, value)
 	end
 end
 
+-- CoA class-scoped specialization resolver. Source: srhinos/coa-datamine
+-- data/classes/specs.json, current names reconciled against live builder snapshot.
+-- Global spec IDs are not class-local tab indices. Never use global names across classes.
+local CoASpecs = {
+    ["BARBARIAN"] = {{1, "Headhunting"}, {2, "Brutality"}, {3, "Ancestry"}},
+    ["BLOODMAGE"] = {{25, "Fleshweaver"}, {26, "Sanguine"}, {27, "Accursed"}, {99, "Eternal"}},
+    ["CHRONOMANCER"] = {{31, "Time"}, {32, "Infinite"}, {33, "Artificer"}},
+    ["CULTIST"] = {{40, "Heretic"}, {41, "Corruption"}, {42, "Godblade"}, {96, "Dreadnought"}},
+    ["FELSWORN"] = {{7, "Infernal"}, {8, "Slayer"}, {9, "Tyrant"}},
+    ["GUARDIAN"] = {{19, "Gladiator"}, {20, "Inspiration"}, {21, "Vanguard"}},
+    ["KNIGHTOFXOROTH"] = {{16, "Hellfire"}, {17, "Defiance"}, {18, "War"}},
+    ["NECROMANCER"] = {{34, "Death"}, {35, "Animation"}, {36, "Rime"}},
+    ["PRIMALIST"] = {{58, "Grovekeeper"}, {59, "Wildwalker"}, {60, "Mountain King"}, {95, "Geomancy"}},
+    ["PYROMANCER"] = {{37, "Flameweaving"}, {38, "Incineration"}, {39, "Draconic"}},
+    ["RANGER"] = {{28, "Archery"}, {29, "Farstrider"}, {30, "Brigand"}},
+    ["REAPER"] = {{55, "Soul"}, {56, "Harvest"}, {57, "Domination"}},
+    ["RUNEMASTER"] = {{61, "Engravement"}, {62, "Glyphic"}, {63, "Riftblade"}},
+    ["STARCALLER"] = {{43, "Moon Priest"}, {44, "Sentinel"}, {45, "Warden"}, {100, "Moon Guard"}},
+    ["STORMBRINGER"] = {{13, "Wind"}, {14, "Maelstrom"}, {15, "Lightning"}},
+    ["SUNCLERIC"] = {{46, "Piety"}, {47, "Valkyrie"}, {48, "Seraphim"}, {98, "Blessings"}},
+    ["TEMPLAR"] = {{22, "Oathkeeper"}, {23, "Zealot"}, {24, "Crusader"}},
+    ["TINKER"] = {{49, "Demolition"}, {50, "Mechanics"}, {51, "Invention"}},
+    ["VENOMANCER"] = {{52, "Fortitude"}, {53, "Stalking"}, {54, "Rot"}, {101, "Vizier"}},
+    ["WITCHDOCTOR"] = {{4, "Shadowhunting"}, {5, "Voodoo"}, {6, "Brewing"}},
+    ["WITCHHUNTER"] = {{10, "Boltslinger"}, {11, "Houndmaster"}, {12, "Inquisition"}, {97, "Black Knight"}},
+}
+local CoAAliases = {
+    ["WILDWALKER"] = "PRIMALIST",
+    ["SONOFARUGAL"] = "BLOODMAGE",
+    ["PROPHET"] = "VENOMANCER",
+    ["SPIRITMAGE"] = "RUNEMASTER",
+    ["DEMONHUNTER"] = "FELSWORN",
+    ["KNIGHTOFXOROTH"] = "KNIGHTOFXOROTH",
+    ["MONK"] = "TEMPLAR",
+}
+local function CoANormalizeClass(value)
+    if (type(value) ~= "string") then return nil end
+    local key = string.upper(value):gsub("[^A-Z0-9]", "")
+    return CoAAliases[key] or key
+end
+local function CoAResolveSpec(classToken, activeId)
+    local key = CoANormalizeClass(classToken)
+    local specs = key and CoASpecs[key]
+    if (not specs or type(activeId) ~= "number") then return nil end
+    -- First resolve globally unique ChrSpecs IDs (e.g. Primalist Wildwalker 59).
+    for _, entry in ipairs(specs) do
+        if (entry[1] == activeId) then return entry[2] end
+    end
+    -- Do not guess a ChrSpecs ID from a class-local slot index.
+    -- The order of saved records is NOT the live client slot order.
+    return nil
+end
+
+local CoATreeAliases = {
+    ["BARBARIAN"] = {["tactics"] = "Headhunting"},
+    ["BLOODMAGE"] = {["blood"] = "Sanguine", ["ferocity"] = "Accursed", ["packleader"] = "Eternal"},
+    ["CHRONOMANCER"] = {["displacement"] = "Time", ["duality"] = "Infinite"},
+    ["CULTIST"] = {["influence"] = "Heretic", ["bulwark"] = "Dreadnought"},
+    ["FELSWORN"] = {["felblood"] = "Infernal", ["slaying"] = "Slayer", ["demonology"] = "Tyrant"},
+    ["GUARDIAN"] = {["protection"] = "Vanguard"},
+    ["PRIMALIST"] = {["primal"] = "Wildwalker", ["life"] = "Grovekeeper"},
+    ["PYROMANCER"] = {["destruction"] = "Flameweaving"},
+    ["RANGER"] = {["survival"] = "Farstrider", ["dueling"] = "Brigand"},
+    ["REAPER"] = {["reaping"] = "Harvest"},
+    ["RUNEMASTER"] = {["runic"] = "Engravement", ["arcane"] = "Glyphic"},
+    ["STARCALLER"] = {["tides"] = "Moon Priest", ["moonbow"] = "Sentinel", ["hydromancy"] = "Warden", ["astralwarfare"] = "Moon Guard"},
+    ["STORMBRINGER"] = {["gifts"] = "Maelstrom"},
+    ["TEMPLAR"] = {["discipline"] = "Oathkeeper", ["fighting"] = "Zealot", ["runes"] = "Crusader"},
+    ["TINKER"] = {["firearms"] = "Demolition"},
+    ["VENOMANCER"] = {["venom"] = "Rot"},
+    ["WITCHHUNTER"] = {["darkness"] = "Houndmaster", ["witchknight"] = "Black Knight"},
+}
+local function CoAResolveTreeName(classToken, treeName)
+    local key = CoANormalizeClass(classToken)
+    if (not key or type(treeName) ~= "string") then return nil end
+    local clean = treeName:lower():gsub("[^%w]", "")
+    local specs = CoASpecs[key]
+    if (not specs) then return nil end
+    for _, entry in ipairs(specs) do
+        if (entry[2]:lower():gsub("[^%w]", "") == clean) then return entry[2] end
+    end
+    return CoATreeAliases[key] and CoATreeAliases[key][clean] or nil
+end
+local function CoAReadCurrentTalentTree(classToken)
+    -- WotLK talent tabs return name, texture, pointsSpent, ...
+    -- Ascension clients may not expose this; never guess from tab index.
+    if (type(_G.GetNumTalentTabs) ~= "function" or type(_G.GetTalentTabInfo) ~= "function") then return nil end
+    local ok, count = pcall(_G.GetNumTalentTabs)
+    if (not ok or type(count) ~= "number") then return nil end
+    local best, maxPoints, tied = nil, 0, false
+    for i = 1, math.min(count, 10) do
+        local good, tabName, texture, points = pcall(_G.GetTalentTabInfo, i)
+        if (good and type(points) == "number" and points > 0) then
+            local matched = CoAResolveTreeName(classToken, tabName)
+            if (matched) then
+                if (points > maxPoints) then best, maxPoints, tied = matched, points, false
+                elseif (points == maxPoints) then tied = true end
+            end
+        end
+    end
+    if (not tied) then return best end
+end
+
 -- ~talent ~icon
 --code for when hovering over the class/spec icon in the player bar
 local iconFrame_OnEnter = function(self)
@@ -2103,6 +2206,14 @@ local iconFrame_OnEnter = function(self)
 			local spec = Details.cached_specs[serial] or actor.spec
 			local talents = Details.cached_talents[serial]
 			local ilvl = Details.ilevel:GetIlvl(serial)
+            -- The local player does not require an inspect request.
+            if (serial and serial == UnitGUID("player")) then
+                local current = Details:CoAReadEquippedItemLevel("player")
+                if (current ~= nil) then
+                    Details.item_level_pool[serial] = {name = name, ilvl = current, time = time()}
+                    ilvl = Details.item_level_pool[serial]
+                end
+            end
 
 			local iconSize = 20
 			local instance = Details:GetInstance(self.row.instance_id)
@@ -2118,12 +2229,85 @@ local iconFrame_OnEnter = function(self)
 				end
 			end
 
+            -- Always show class and spec as text, not only an icon.
+            local classLabel = class
+            if (type(class) == "string") then
+                classLabel = (_G.LOCALIZED_CLASS_NAMES_MALE and _G.LOCALIZED_CLASS_NAMES_MALE[class]) or class
+            end
+            -- Resolve only class-validated specialization identities.
+            local normalizedClass = CoANormalizeClass(class)
+            local heroClass = CoASpecs[normalizedClass] ~= nil
+            local resolvedSpec
+            local function resolveByName(value)
+                if (type(value) ~= "string") then return nil end
+                local entries = CoASpecs[normalizedClass]
+                if (not entries) then return nil end
+                local needle = value:lower():gsub("[^%w]", "")
+                for _, entry in ipairs(entries) do
+                    if (entry[2]:lower():gsub("[^%w]", "") == needle) then
+                        return entry[2]
+                    end
+                end
+            end
+            if (heroClass) then
+                local ascension = _G.C_CharacterAdvancement
+                if (serial == UnitGUID("player")) then
+                    if (ascension) then
+                        for _, method in ipairs({"GetActiveSpecName", "GetActiveSpecializationName", "GetCurrentSpecName"}) do
+                            if (type(ascension[method]) == "function") then
+                                local ok, value = pcall(ascension[method])
+                                if (ok) then resolvedSpec = CoAResolveTreeName(class, value) end
+                                if (resolvedSpec) then break end
+                            end
+                        end
+                    end
+                    if (not resolvedSpec) then
+                        resolvedSpec = CoAReadCurrentTalentTree(class)
+                    end
+                    if (not resolvedSpec and type(_G.GetSpecializationInfo) == "function" and type(_G.GetSpecialization) == "function") then
+                        local ok, idx = pcall(_G.GetSpecialization)
+                        if (ok and idx) then
+                            local success, id, title = pcall(_G.GetSpecializationInfo, idx)
+                            if (success) then resolvedSpec = CoAResolveTreeName(class, title) end
+                        end
+                    end
+                    -- GetActiveSpecID may return a class-local slot or a stale
+                    -- internal record. It is NOT proof of a named specialization.
+                else
+                    -- Remote actors: only accept a cached name, or a verified
+                    -- class-scoped ChrSpecs ID; never use another class's name.
+                    if (type(spec) == "string") then resolvedSpec = CoAResolveTreeName(class, spec) end
+                    if (not resolvedSpec and tonumber(spec) and tonumber(spec) > 4) then
+                        resolvedSpec = CoAResolveSpec(class, tonumber(spec))
+                    end
+                end
+            else
+                resolvedSpec = specName
+            end
+            if (heroClass and normalizedClass) then
+                for key, entries in pairs(CoASpecs) do
+                    if (key == normalizedClass) then
+                        for _, entry in ipairs(entries) do
+                            if (entry[2] == resolvedSpec) then
+                                classLabel = ({["KNIGHTOFXOROTH"]="Knight of Xoroth",
+                                    ["SUNCLERIC"]="Sun Cleric", ["WITCHDOCTOR"]="Witch Doctor",
+                                    ["WITCHHUNTER"]="Witch Hunter"})[key]
+                                    or (key:sub(1,1) .. key:sub(2):lower())
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+            specName = resolvedSpec or "Unknown (spec not verified)"
+            local classAndSpec = tostring(classLabel or "Unknown class") .. " - " .. tostring(specName)
+
 			if (instance.row_info.textL_translit_text) then
 				--translate cyrillic alphabet to western alphabet by Vardex (https://github.com/Vardex May 22, 2019)
 				local Translit = LibStub("LibTranslit-1.0")
-				GameCooltip:AddLine(Translit:Transliterate(name, "!"), specName)
+				GameCooltip:AddLine(Translit:Transliterate(name, "!"), classAndSpec)
 			else
-				GameCooltip:AddLine(name, specName)
+				GameCooltip:AddLine(name, classAndSpec)
 			end
 
 			if (class == "UNKNOW" or class == "UNGROUPPLAYER") then
@@ -2141,7 +2325,7 @@ local iconFrame_OnEnter = function(self)
 
 			local gotInfo
 			local localizedItemLevelString = _G.AVERAGE_ITEM_LEVEL_S
-			if (ilvl) then
+			if (ilvl and type(ilvl.ilvl) == "number") then
 				GameCooltip:AddLine(format(localizedItemLevelString, floor(ilvl.ilvl)))
 				GameCooltip:AddIcon([[]], 1, 1, 1, 20)
 				Details:AddTooltipBackgroundStatusbar()

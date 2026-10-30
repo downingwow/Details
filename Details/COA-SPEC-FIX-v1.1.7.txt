@@ -1,0 +1,5 @@
+Class-scoped names for 21 custom classes and 70 spec records.
+Talent-tree aliases for old internal names.
+Removed unreliable local player active numeric ID fallback that misidentified Wildwalker as Grovekeeper.
+If Ascension returns no usable spec name or talent data, tooltip says Unknown rather than guessing.
+Unverified in-game.

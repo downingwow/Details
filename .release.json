@@ -1,5 +1,5 @@
 {
-  "version": "v1.1.0",
+  "version": "v1.1.7",
   "prerelease": false,
   "folders": [
     "Details",
@@ -18,3 +18,4 @@
   ],
   "extras": []
 }
+
