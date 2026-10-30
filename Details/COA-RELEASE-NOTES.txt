@@ -1,0 +1,19 @@
+Details! Damage Meter — CoA v1.0.3 TEST
+Maintainer: Uncle Bone
+Repository: https://github.com/downingwow/Details
+Target: Ascension Conquest Reborn / client based on WoW 3.3.5a
+
+Fixes in this test build:
+- Preserve trash and custom-boss combat segments at logout/reload (unless manually cleared or beyond the configured save cap).
+- Raise default history size to 50 for new profiles; existing settings are respected.
+- Correct invalid summon parser identifiers and add null-GUID safeguards.
+- Improve unnamed-summon fallbacks using cached name, combat log spell name, or client spell name.
+- Label Tinker specialization 51 as Demolition in existing reference mapping.
+- Add owner/maintainer/repository metadata; retain original multi-module Details package.
+
+External reference research: Ascension archive, CoA AzerothCore, DealsBeam ascension-db, CoA preservation datasets, CoA databank, talent scraper and historical BisBeard data.
+Those resources are REFERENCES: no claim that a full spell database has been imported.
+
+Limitations: Unrecognized effects and summon ownership still require actual client combat log samples.
+No in-game Conquest Reborn validation was possible in this environment.
+Back up WTF/Account/.../SavedVariables prior to testing.

@@ -1,0 +1,7 @@
+Details! CoA v1.0.4 TEST - Primalist pet attribution
+Maintainer: Uncle Bone | https://github.com/downingwow/Details
+Evidence: user combat log 2026-10-29 16:54:24; 584 lines; 0 SPELL_SUMMON events; 66 Devilsaur damage events.
+Pet GUID 0xF14000055E000085 name Devilsaur flags 0x1111; owner GUID 0x000000000000106C name Primalist flags 0x511.
+Observed explicit link events: 521231 (player to pet focus), 803348 (player to pet synergy), 803350 (pet to player synergy).
+Fix: learn pet-owner from these explicit combat-log link events even when SPELL_SUMMON is absent. Refresh live UnitGUID(pet) and UnitName(pet) before ignoring unresolved pet. Correct interrupt owner lookup sourceName argument.
+Scope: targeted Primalist evidence, not a global inference for every CoA summon. Requires in-game testing and fresh combat segment after install.

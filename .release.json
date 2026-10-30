@@ -1,0 +1,20 @@
+{
+  "version": "v1.1.0",
+  "prerelease": false,
+  "folders": [
+    "Details",
+    "Details_3DModelsPaths",
+    "Details_ChartViewer",
+    "Details_Compare2",
+    "Details_DataStorage",
+    "Details_DeathGraphs",
+    "Details_EncounterDetails",
+    "Details_RaidCheck",
+    "Details_Streamer",
+    "Details_TargetCaller",
+    "Details_TimeLine",
+    "Details_TinyThreat",
+    "Details_Vanguard"
+  ],
+  "extras": []
+}
