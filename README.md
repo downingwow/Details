@@ -1,6 +1,6 @@
 # Details! CoA v1.1.7 — Specialization and tooltip fixes
 
-> **[⬇ Download v1.1.7]( https://github.com/downingwow/Details/releases/download/v1.1.7/Details-v1.1.7.zip )**
+> **[⬇ Download v1.1.7](https://github.com/downingwow/Details/releases/download/v1.1.7/Details-v1.1.7.zip)**
 
 
 Updates since v1.1.0:
