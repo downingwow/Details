@@ -1,5 +1,8 @@
 # Details! CoA v1.1.7 — Specialization and tooltip fixes
 
+> **[⬇ Download v1.1.7]( https://github.com/downingwow/Details/releases/download/v1.1.7/Details-v1.1.7.zip )**
+
+
 Updates since v1.1.0:
 
 - Adds class-scoped specialization mapping for 21 custom classes and 70 specialization records, with talent-tree aliases for older internal names.
