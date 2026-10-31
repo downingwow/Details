@@ -1,6 +1,6 @@
 # Details! CoA v1.1.7 — Specialization and tooltip fixes
 
-> **[⬇ Download v1.1.7](https://github.com/downingwow/Details/releases/download/v1.1.7/Details-v1.1.7.zip)**
+> **[⬇ Download v1.1.7](https://github.com/uncle-bone/Details/releases/download/v1.1.7/Details-v1.1.7.zip)**
 
 
 Updates since v1.1.0:
@@ -16,7 +16,7 @@ Install all Details* folders side by side in Interface/AddOns. Enable the main D
 
 Published on the requested stable release channel. The supplied build still carries test labels and has not been fully validated in the live Conquest Reborn client. Historical mappings are not proof of every current specialization ID.
 
-Maintainer: Uncle Bone — https://github.com/downingwow
+Maintainer: Uncle Bone — https://github.com/uncle-bone
 Original licenses and attribution are retained.
 
 ## Earlier combat changes
@@ -33,9 +33,9 @@ This is the complete supplied multi-folder package. Some optional legacy plugins
 
 Full live-client validation and exhaustive Tinker pet/turret mappings remain pending. Original Details! attribution and bundled licenses are retained.
 
-Maintainer: Uncle Bone — https://github.com/downingwow
+Maintainer: Uncle Bone — https://github.com/uncle-bone
 
 ## Support and attribution
 
-Report errors with your addon version, UI addons and full Lua traceback at https://github.com/downingwow/Details/issues. Target: Ascension Conquest Reborn / WoW 3.3.5a (Interface 30300). Original source notices and bundled third-party licenses are preserved.
+Report errors with your addon version, UI addons and full Lua traceback at https://github.com/uncle-bone/Details/issues. Target: Ascension Conquest Reborn / WoW 3.3.5a (Interface 30300). Original source notices and bundled third-party licenses are preserved.
 
